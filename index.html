@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>健身小程序 · 纯空手上半身训练</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="topbar">
+  <h1>💪 健身小程序</h1>
+  <p class="subtitle">纯空手 · 上半身薄肌 · 只用地板和自重</p>
+</header>
+
+<nav class="tabs">
+  <button class="tab active" data-tab="library">动作库</button>
+  <button class="tab" data-tab="plan">我的计划</button>
+  <button class="tab" data-tab="workout">训练</button>
+  <button class="tab" data-tab="history">记录</button>
+</nav>
+
+<main>
+  <!-- ============ 动作库 ============ -->
+  <section id="tab-library" class="panel active">
+    <div class="filters">
+      <div class="filter-row">
+        <span class="filter-label">器械模式</span>
+        <div class="seg" id="modeSeg">
+          <button class="seg-btn active" data-mode="floor">纯空手</button>
+          <button class="seg-btn" data-mode="all">纯空手 + 墙面</button>
+        </div>
+      </div>
+      <div class="filter-row">
+        <span class="filter-label">肌群（可多选）</span>
+        <div class="chips" id="muscleChips"></div>
+      </div>
+    </div>
+    <div class="grid" id="exerciseGrid"></div>
+    <p class="empty-hint" id="libraryEmpty" hidden>这个组合下没有动作，换个筛选试试。</p>
+  </section>
+
+  <!-- ============ 我的计划 ============ -->
+  <section id="tab-plan" class="panel">
+    <div class="filter-row">
+      <span class="filter-label">训练日（每周哪几天练）</span>
+      <div class="chips" id="weekdayChips"></div>
+    </div>
+    <div id="planList"></div>
+    <p class="empty-hint" id="planEmpty">计划还是空的。去动作库点任意动作的「+ 加入计划」。</p>
+  </section>
+
+  <!-- ============ 训练 ============ -->
+  <section id="tab-workout" class="panel">
+    <div id="workoutHead"></div>
+    <div id="workoutList"></div>
+    <button id="finishBtn" class="primary-btn" hidden>完成本次训练 ✅</button>
+    <p class="empty-hint" id="workoutEmpty" hidden>今天不是训练日，或者计划还是空的。<br>去「我的计划」里挑动作、选训练日。</p>
+  </section>
+
+  <!-- ============ 记录 ============ -->
+  <section id="tab-history" class="panel">
+    <div class="stats" id="statsBox"></div>
+    <div id="historyList"></div>
+    <p class="empty-hint" id="historyEmpty">还没有训练记录。完成第一次训练后，这里会记下来。</p>
+  </section>
+</main>
+
+<div class="toast" id="toast"></div>
+
+<script src="exercises.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
