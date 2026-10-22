@@ -38,12 +38,25 @@ main { padding: 12px; max-width: 980px; margin: 0 auto; }
 .tag { font-size: 11px; background: #fff3ec; color: var(--brand); border-radius: 6px; padding: 2px 7px; }
 .tag.gray { background: #f0f1f3; color: var(--sub); }
 
-.diagram { background: #fbfbfc; border: 1px dashed var(--line); border-radius: 10px; margin: 8px 0; }
+.diagram { background: #fbfbfc; border: 1px dashed var(--line); border-radius: 10px; margin: 8px 0; padding: 4px; cursor: pointer; }
 .diagram svg { width: 100%; height: auto; display: block; }
 .frame-b { opacity: 0; transition: opacity .25s; }
-.playing .frame-b { opacity: 1; }
-.playing .frame-a { opacity: 0; }
 .frame-a { transition: opacity .25s; }
+.diagram:hover .frame-b, .diagram.playing .frame-b { opacity: 1; }
+.diagram:hover .frame-a, .diagram.playing .frame-a { opacity: 0; }
+.hover-hint { font-size: 11px; color: var(--sub); text-align: center; padding: 3px 0 1px; }
+
+/* 真人示范图：双格照片，悬停时滑动切换起始/发力 */
+.diagram.photo { padding: 0; overflow: hidden; border-style: solid; }
+.photo-frame { position: relative; overflow: hidden; aspect-ratio: 3 / 4; }
+.photo-frame img { width: 200%; height: 100%; max-width: none; object-fit: cover; display: block; }
+.diagram.photo:hover .photo-frame img, .diagram.photo.playing .photo-frame img { animation: slideFrames 1.5s ease-in-out infinite alternate; }
+@keyframes slideFrames { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+.badge { position: absolute; left: 8px; bottom: 8px; background: rgba(0,0,0,.55); color: #fff; font-size: 11px; padding: 3px 9px; border-radius: 999px; transition: opacity .25s; }
+.b-effort { opacity: 0; }
+.diagram.photo:hover .b-start, .diagram.photo.playing .b-start { opacity: 0; }
+.diagram.photo:hover .b-effort, .diagram.photo.playing .b-effort { opacity: 1; }
+.diagram.photo .hover-hint { padding: 5px 0 6px; }
 
 .dose { font-size: 13px; margin: 4px 0; }
 .tip { font-size: 13px; color: #444; background: #fff8f2; border-left: 3px solid var(--brand); padding: 7px 9px; border-radius: 0 8px 8px 0; margin: 8px 0; }

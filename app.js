@@ -17,7 +17,6 @@ let db = Object.assign({ plan: [], weekdays: [1, 3, 5], records: [] }, store.loa
 
 let curMode = 'floor';                    // 'floor' 纯空手 | 'all' 含墙面
 const curMuscles = new Set(MUSCLES);      // 当前勾选的肌群
-const pausedCards = new Set();            // 被单独暂停动画的动作 id
 const exById = Object.fromEntries(EXERCISES.map(e => [e.id, e]));
 
 const $ = sel => document.querySelector(sel);
@@ -64,12 +63,23 @@ function diagramSvg(ex) {
   </svg>`;
 }
 
-// 全局动画时钟：在起始帧 / 发力帧之间来回切
-setInterval(() => {
-  document.querySelectorAll('.diagram').forEach(d => {
-    if (!pausedCards.has(d.dataset.id)) d.classList.toggle('playing');
-  });
-}, 950);
+// 动画规则（用户定）：默认静止在起始帧，鼠标悬停（触屏点一下）才动
+// 真人图：左右双格照片，悬停时画面在起始格 / 发力格之间滑动
+function diagramHtml(ex) {
+  if (ex.img) {
+    return `<div class="diagram photo" data-id="${ex.id}" title="把鼠标放上来（或点一下）看动作">
+      <div class="photo-frame">
+        <img src="${ex.img}" alt="${ex.name}真人示范图">
+        <span class="badge b-start">起始</span><span class="badge b-effort">发力</span>
+      </div>
+      <p class="hover-hint">🖱 把鼠标放上来，图就动起来</p>
+    </div>`;
+  }
+  return `<div class="diagram" data-id="${ex.id}" title="把鼠标放上来（或点一下）看动作">
+    ${diagramSvg(ex)}
+    <p class="hover-hint">🖱 把鼠标放上来，图就动起来</p>
+  </div>`;
+}
 
 // ---------------- 动作库 ----------------
 function renderChips() {
@@ -92,22 +102,18 @@ function renderLibrary() {
     const inPlan = db.plan.some(p => p.id === ex.id);
     return `<article class="card">
       <div class="card-head"><h3>${ex.name}</h3><span class="en">${ex.en}</span></div>
-      <div class="tags"><span class="tag">${ex.muscle}</span><span class="tag gray">${ex.level}</span><span class="tag gray">${ex.mode === 'floor' ? '纯空手' : '需墙面'}</span></div>
-      <div class="diagram" data-id="${ex.id}">${diagramSvg(ex)}</div>
+      <div class="tags"><span class="tag">${ex.muscle}</span><span class="tag gray">${ex.level}</span><span class="tag gray">${ex.mode === 'floor' ? '纯空手' : '需墙面'}</span>${ex.img ? '<span class="tag">真人示范</span>' : ''}</div>
+      ${diagramHtml(ex)}
       <p class="dose">建议：<b>${ex.sets} 组 × ${ex.reps}</b></p>
       <p class="tip">口诀：${ex.tip}</p>
       <div class="card-actions">
-        <button class="btn pause-btn" data-id="${ex.id}">${pausedCards.has(ex.id) ? '▶ 播放图解' : '⏸ 暂停图解'}</button>
         <button class="btn add ${inPlan ? 'added' : ''}" data-id="${ex.id}">${inPlan ? '✓ 已在计划' : '+ 加入计划'}</button>
       </div>
     </article>`;
   }).join('');
 
-  document.querySelectorAll('.pause-btn').forEach(b => b.onclick = () => {
-    const id = b.dataset.id;
-    pausedCards.has(id) ? pausedCards.delete(id) : pausedCards.add(id);
-    renderLibrary();
-  });
+  // 触屏没有悬停：点一下图解切换播放状态
+  document.querySelectorAll('.diagram').forEach(d => d.onclick = () => d.classList.toggle('playing'));
   document.querySelectorAll('.btn.add').forEach(b => b.onclick = () => {
     const id = b.dataset.id;
     if (db.plan.some(p => p.id === id)) { toast('已经在计划里了'); return; }

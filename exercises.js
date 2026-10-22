@@ -15,6 +15,7 @@ const EXERCISES = [
   // ---------------- 胸 ----------------
   {
     id: 'pushup', name: '标准俯卧撑', en: 'Push-Up', muscle: '胸', mode: 'floor',
+    img: 'img/pushup.jpg',
     level: '新手', sets: 4, reps: '8–12 次',
     tip: '身体绷成一条直线，胸口贴地再推起，别塌腰别撅屁股',
     arrow: { x: 14, y: 78, type: 'updown' },
@@ -46,6 +47,7 @@ const EXERCISES = [
   // ---------------- 背 ----------------
   {
     id: 'superman', name: '超人式', en: 'Superman', muscle: '背', mode: 'floor',
+    img: 'img/superman.jpg',
     level: '新手', sets: 3, reps: '12–15 次',
     tip: '趴平，手脚同时往上抬，像超人起飞，顶峰停一秒再放下',
     arrow: { x: 100, y: 40, type: 'up' },
@@ -87,6 +89,7 @@ const EXERCISES = [
   // ---------------- 肩 ----------------
   {
     id: 'pike-pushup', name: '派克俯卧撑', en: 'Pike Push-Up', muscle: '肩', mode: 'floor',
+    img: 'img/pike-pushup.jpg',
     level: '进阶', sets: 4, reps: '6–10 次',
     tip: '屁股撅到最高，头往两手中间的地面扎，推起来全靠肩',
     arrow: { x: 14, y: 84, type: 'updown' },
@@ -140,6 +143,7 @@ const EXERCISES = [
   // ---------------- 核心 ----------------
   {
     id: 'plank', name: '平板支撑', en: 'Plank', muscle: '核心', mode: 'floor',
+    img: 'img/plank.jpg',
     level: '新手', sets: 3, reps: '30–60 秒',
     tip: '小臂撑地，身体一条直线，肚子收紧，宁可少撑别塌腰',
     arrow: { x: 168, y: 40, type: 'hold' },
