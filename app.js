@@ -15,7 +15,8 @@ const store = {
 let db = Object.assign({ plan: [], weekdays: [1, 3, 5], records: [] }, store.load());
 // plan: [{ id, sets }]  weekdays: 1=周一 ... 7=周日
 
-let curMode = 'floor';                    // 'floor' 纯空手 | 'all' 含墙面
+let curEquip = 'all';                     // 器械筛选：all 全部 | floor 纯空手 | wall 墙面 | dumbbell 哑铃 | barbell 杠铃 | band 弹力带 | pullup 单杠 | wheel 健腹轮
+const EQUIP_LABEL = { floor: '纯空手', wall: '需墙面', dumbbell: '哑铃', barbell: '杠铃', band: '弹力带', pullup: '单杠', wheel: '健腹轮' };
 const curMuscles = new Set(MUSCLES);      // 当前勾选的肌群
 const exById = Object.fromEntries(EXERCISES.map(e => [e.id, e]));
 
@@ -66,18 +67,26 @@ function diagramSvg(ex) {
 // 动画规则（用户定）：默认静止在起始帧，鼠标悬停（触屏点一下）才动
 // 真人图：左右双格照片，悬停时画面在起始格 / 发力格之间滑动
 function diagramHtml(ex) {
+  if (ex.video) {
+    return `<div class="diagram video" data-id="${ex.id}">
+      <div class="video-frame">
+        <video src="${ex.video}" muted loop playsinline preload="metadata"></video>
+      </div>
+    </div>`;
+  }
   if (ex.img) {
     return `<div class="diagram photo" data-id="${ex.id}" title="把鼠标放上来（或点一下）看动作">
       <div class="photo-frame">
         <img src="${ex.img}" alt="${ex.name}真人示范图">
         <span class="badge b-start">起始</span><span class="badge b-effort">发力</span>
       </div>
-      <p class="hover-hint">🖱 把鼠标放上来，图就动起来</p>
     </div>`;
+  }
+  if (!ex.frames) {
+    return `<div class="diagram pending" data-id="${ex.id}"><p class="pending-txt">🎬 真人动图制作中</p></div>`;
   }
   return `<div class="diagram" data-id="${ex.id}" title="把鼠标放上来（或点一下）看动作">
     ${diagramSvg(ex)}
-    <p class="hover-hint">🖱 把鼠标放上来，图就动起来</p>
   </div>`;
 }
 
@@ -96,13 +105,13 @@ function renderChips() {
 
 function renderLibrary() {
   const list = EXERCISES.filter(e =>
-    (curMode === 'all' || e.mode === 'floor') && curMuscles.has(e.muscle));
+    (curEquip === 'all' || e.mode === curEquip) && curMuscles.has(e.muscle));
   $('#libraryEmpty').hidden = list.length > 0;
   $('#exerciseGrid').innerHTML = list.map(ex => {
     const inPlan = db.plan.some(p => p.id === ex.id);
     return `<article class="card">
       <div class="card-head"><h3>${ex.name}</h3><span class="en">${ex.en}</span></div>
-      <div class="tags"><span class="tag">${ex.muscle}</span><span class="tag gray">${ex.level}</span><span class="tag gray">${ex.mode === 'floor' ? '纯空手' : '需墙面'}</span>${ex.img ? '<span class="tag">真人示范</span>' : ''}</div>
+      <div class="tags"><span class="tag">${ex.muscle}</span><span class="tag gray">${ex.level}</span><span class="tag gray">${EQUIP_LABEL[ex.mode] || ex.mode}</span>${ex.video ? '<span class="tag">真人动图</span>' : ex.img ? '<span class="tag">真人示范</span>' : ''}</div>
       ${diagramHtml(ex)}
       <p class="dose">建议：<b>${ex.sets} 组 × ${ex.reps}</b></p>
       <p class="tip">口诀：${ex.tip}</p>
@@ -113,7 +122,16 @@ function renderLibrary() {
   }).join('');
 
   // 触屏没有悬停：点一下图解切换播放状态
-  document.querySelectorAll('.diagram').forEach(d => d.onclick = () => d.classList.toggle('playing'));
+  document.querySelectorAll('.diagram').forEach(d => {
+    const v = d.querySelector('video');
+    if (v) {
+      d.addEventListener('mouseenter', () => v.play());
+      d.addEventListener('mouseleave', () => v.pause());
+      d.onclick = () => { v.paused ? v.play() : v.pause(); };
+    } else {
+      d.onclick = () => d.classList.toggle('playing');
+    }
+  });
   document.querySelectorAll('.btn.add').forEach(b => b.onclick = () => {
     const id = b.dataset.id;
     if (db.plan.some(p => p.id === id)) { toast('已经在计划里了'); return; }
@@ -253,7 +271,7 @@ document.querySelectorAll('.tab').forEach(t => t.onclick = () => switchTab(t.dat
 
 document.querySelectorAll('#modeSeg .seg-btn').forEach(b => b.onclick = () => {
   document.querySelectorAll('#modeSeg .seg-btn').forEach(x => x.classList.toggle('active', x === b));
-  curMode = b.dataset.mode;
+  curEquip = b.dataset.mode;
   renderLibrary();
 });
 
